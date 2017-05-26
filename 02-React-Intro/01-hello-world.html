@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello World</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script>
+		var HelloWorld = React.createClass({
+			render : function(){
+
+				return React.createElement('div', {}, 
+					React.createElement('h1', {}, 'Welcome to React.js'),
+					React.createElement('hr', {}, null),
+					React.createElement('p', {}, 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut explicabo, quas magni distinctio ipsum at. Voluptas mollitia enim necessitatibus facere eligendi dolorum dicta nulla distinctio laudantium, recusandae in vel quas.')
+				);
+			}
+		});
+		function init(){
+			ReactDOM.render(React.createElement(HelloWorld), document.getElementById('content'));
+		}
+		window.addEventListener('DOMContentLoaded', init);
+	</script>
+</head>
+<body>
+	<div id="content">
+		
+	</div>
+</body>
+</html>
