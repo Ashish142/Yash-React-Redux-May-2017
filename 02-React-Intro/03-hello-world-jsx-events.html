@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello World</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="jquery.js"></script>
+	<script type="text/babel">
+		var HelloWorld = React.createClass({
+
+			getInitialState : function(){
+				return { msg : '' };
+			},
+			onGreetClick : function(){
+				var message = this.refs.txtMessage.value;
+				this.setState({msg : message});
+			},
+			render : function(){
+
+				return (
+					<div>
+						<label>Message :</label>
+						<input type="text" ref="txtMessage"/>
+						<input type="button" value="Greet" onClick={this.onGreetClick}/>
+						<h1>{this.state.msg}</h1>
+						<hr/>
+						<p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut explicabo, quas magni distinctio ipsum at. Voluptas mollitia enim necessitatibus facere eligendi dolorum dicta nulla distinctio laudantium, recusandae in vel quas.</p>
+					</div>
+				);
+			}
+		});
+
+		ReactDOM.render(<HelloWorld >
+			
+		</HelloWorld>, document.getElementById('content-react'));
+		
+		
+	</script>
+</head>
+<body>
+	<div id="content-react">
+		
+	</div>
+</body>
+</html>

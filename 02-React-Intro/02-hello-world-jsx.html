@@ -6,26 +6,66 @@
 	<script src="react.js"></script>
 	<script src="react-dom.js"></script>
 	<script src="babel.min.js"></script>
+	<script src="jquery.js"></script>
 	<script type="text/babel">
 		var HelloWorld = React.createClass({
 			render : function(){
 
 				return (
 					<div>
-						<h1>Welcome to React.js</h1>
+						<h1>{this.props.msg}</h1>
 						<hr/>
 						<p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut explicabo, quas magni distinctio ipsum at. Voluptas mollitia enim necessitatibus facere eligendi dolorum dicta nulla distinctio laudantium, recusandae in vel quas.</p>
 					</div>
 				);
 			}
 		});
+
+		function renderReact(){
+			var message = prompt('Enter the message');
+			ReactDOM.render(<HelloWorld msg={message}></HelloWorld>, document.getElementById('content-react'));
+		}
+
+
+		function HelloWorldRaw(){
+			var $root = this.$root = $('<div></div>');
+			var _template = `
+				<div>
+					<h1>Welcome to React.js</h1>
+					<hr/>
+					<p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut explicabo, quas magni distinctio ipsum at. Voluptas mollitia enim necessitatibus facere eligendi dolorum dicta nulla distinctio laudantium, recusandae in vel quas.</p>
+				</div>
+			`;
+			this.render = function(){
+				$root.html(_template);
+			}
+		}
+
+		var helloWorldRaw = new HelloWorldRaw();
+
+		function renderRaw(){
+			helloWorldRaw.render();
+		}
 		
-		ReactDOM.render(<HelloWorld></HelloWorld>, document.getElementById('content'));
+		$(function(){
+			$('#renderReact').click(renderReact);
+
+			helloWorldRaw.$root.appendTo('#content-raw');
+
+			$('#renderRaw').click(renderRaw);
+		})
+		
 		
 	</script>
 </head>
 <body>
-	<div id="content">
+	<input type="button" value="Render-React" id="renderReact" />
+	<div id="content-react">
+		
+	</div>
+
+	<input type="button" value="Render-Raw" id="renderRaw" />
+	<div id="content-raw">
 		
 	</div>
 </body>
