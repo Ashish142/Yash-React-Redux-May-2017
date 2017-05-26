@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Salary Calculator</title>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+		.field{
+			margin-bottom: 10px;
+		}
+		label{
+			display: block;
+		}
+		#divResult{
+			color : red;
+			font-size: 22pt;
+		}
+	</style>
+	<script src="jquery.js"></script>
+	<script src="handlebars.js"></script>
+	<script>
+		String.prototype.toInt = function(){
+			return parseInt(this, 10);
+		};
+
+		//State & Behavior
+		//Model
+		function SalaryCalculator(){
+			var _data = {
+				basic : 0,
+				hra : 0,
+				da : 0,
+				tax : 0,
+				salary : 0
+			};
+			this.get = function(attrName){
+				return _data[attrName];
+			};
+			this.set = function(attrName, value){
+				if (_data[attrName] === value) return;
+				_data[attrName] = value;
+				//trigger change notification for 'attrName'
+				triggerChange();
+			};
+
+			function triggerChange(){
+				var listenerFns = _changeListeners;
+				listenerFns.forEach(function(listenerFn){
+					if (typeof listenerFn === 'function')
+						listenerFn();	
+				});
+			}
+
+			var _changeListeners = [];
+
+			this.onChange = function(listenerFn){
+				if (typeof listenerFn !== 'function') return;
+				_changeListeners.push(listenerFn);
+			};
+
+			this.toJson = function(){
+				return {
+					basic : _data.basic,
+					hra : _data.hra,
+					da : _data.da,
+					tax : _data.tax,
+					salary : _data.salary
+				};
+			};
+
+		}
+		SalaryCalculator.prototype.calculate = function() {
+			var gross = this.get('basic') + this.get('hra') + this.get('da');
+			var net = gross * ((100-this.get('tax'))/100);
+			this.set('salary', net);
+
+		};
+
+		//Interaction
+		//View
+		function SalaryCalculatorView(calculator){
+
+			var _template = `
+				<div class="content" id="view1">
+					<div class="field">
+						<label for="">Basic :</label>
+						<input type="text" id="txtBasic" value={{basic}}>
+					</div>
+					<div class="field">
+						<label for="">HRA :</label>
+						<input type="text" id="txtHra" value={{hra}}>
+					</div>
+					<div class="field">
+						<label for="">DA :</label>
+						<input type="text" id="txtDa" value={{da}}>
+					</div>
+					<div class="field">
+						<label for="">Tax :</label>
+						<input type="range" id="rangeTax" min="0" max="30" value={{tax}}>
+						<span id="spanTax">{{tax}}</span>
+					</div>
+					<div class="field">
+						<input type="button" value="Calculate" id="btnCalculate">
+					</div>
+					<div class="field">
+						<div id="divResult">{{salary}}</div>
+					</div>
+				</div>`;
+
+			var $root = this.$root = $('<div></div>');
+
+			var templateFn = Handlebars.compile(_template);
+
+			this.render = function(){
+				var data = calculator.toJson();
+				var renderedHTML = templateFn(data);
+				$root.html(renderedHTML);
+			};
+			//React to User Actions
+			$root.on('change', '#txtBasic', function(){
+				calculator.set('basic', $(this).val().toInt());
+			});
+
+			$root.on('change', '#txtHra', function(){
+				calculator.set('hra', $(this).val().toInt());
+			});
+
+			$root.on('change', '#txtDa', function(){
+				calculator.set('da', $(this).val().toInt());
+			});
+
+			$root.on('change', '#rangeTax', function(){
+				calculator.set('tax', $(this).val().toInt());
+			});
+			
+			$root.on('click', '#btnCalculate', function(){
+				calculator.calculate();
+			});
+
+			//React to Model changes
+			calculator.onChange(this.render);
+
+		}
+		$(function(){
+			window.calculator = new SalaryCalculator();
+			
+			/*var view1 = new SalaryCalculatorView(calculator);
+			view1.render();
+			view1.$root.appendTo(document.body);
+
+			var view2 = new SalaryCalculatorView(calculator);
+			view2.render();
+			view2.$root.appendTo(document.body);*/
+			
+		});
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	
+</body>
+</html>
