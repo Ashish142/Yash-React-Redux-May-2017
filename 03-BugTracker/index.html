@@ -57,31 +57,56 @@
 			}
 		}
 
+		class Bug{
+			constructor(name){
+				this.name = name;
+				this.isClosed = false;
+			}
+			toggle(){
+				this.isClosed = !this.isClosed;
+			}
+		}
+
 		class BugList extends EventEmitter{
 			constructor(){
 				super();
 				this._list = [];
 			}
 			addNew(bugName){
-				this._list.push(bugName);
+				let newBug = new Bug(bugName);
+				this._list.push(newBug);
 				this.triggerChange();
 			}
 			getBugs(){
 				return [...this._list];
 			}
 		}
-		class BugTracker extends React.Component{
-			onAddNewClick(){
-				var bugName = this.refs.txtBugName.value;
-				this.props.bugList.addNew(bugName);
+		class BugItem extends React.Component{
+			onBugNameClick(){
+				this.props.bug.toggle();
 			}
 			render(){
-				var bugs = this.props.bugList.getBugs();
-				var bugItems = bugs.map((bug, index) => (
-					<li key={index}>
-						<span className="bugname">{bug}</span>
+				var bug = this.props.bug;
+				return(
+					<li>
+						<span className="bugname" onClick={this.onBugNameClick.bind(this)}>{bug.name}</span>
+						<div>{bug.isClosed.toString()}</div>
 						<div className="datetime">[Created At]</div>
 					</li>
+				)
+			}
+		}
+		class BugTracker extends React.Component{
+			onAddNewClick(){
+				let bugName = this.refs.txtBugName.value;
+				this.props.bugList.addNew(bugName);
+			}
+			
+			
+			render(){
+				let bugs = this.props.bugList.getBugs();
+				let bugItems = bugs.map((bug, index) => (
+					<BugItem bug={bug} key={index}></BugItem>
 				));
 				return(
 					<div>
@@ -105,7 +130,7 @@
 				)
 			}
 		}
-		var bugList = new BugList();
+		let bugList = new BugList();
 		bugList.subscribe(renderApp);
 		function renderApp(){
 			ReactDOM.render(<BugTracker bugList={bugList}></BugTracker>, document.getElementById('content'));
