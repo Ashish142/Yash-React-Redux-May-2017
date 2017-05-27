@@ -128,10 +128,10 @@
 
 		var SalaryCalculator = React.createClass({
 			
-			getOnInputChangeFor : function(model)
+			getOnInputChangeFor : function(model){
 				return function(value){
 					this.props.calculator.set(model, value);
-				}
+				}.bind(this);
 			},
 			
 			onCalculateClick : function(){
@@ -147,7 +147,7 @@
 						<SalaryInput label="HRA :" valueChange={this.getOnInputChangeFor('hra')}></SalaryInput>
 						<SalaryInput label="DA :" valueChange={this.getOnInputChangeFor('da')}></SalaryInput>
 						<SalaryRangeInput label="Tax :" valueChange={this.getOnInputChangeFor('tax')}></SalaryRangeInput>
-						
+
 						<div className="field">
 							<input type="button" value="Calculate" id="btnCalculate" onClick={this.onCalculateClick}/>
 						</div>
