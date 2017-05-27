@@ -83,8 +83,8 @@
 
 		};
 
-		var SalaryDisplay = React.createClass({
-			render : function(){
+		class SalaryDisplay extends React.Component{
+			render(){
 				var displaySalary = this.props.data > 10000 ? 
 					<div id="divResult" className="notpoor">{this.props.data}</div>
 					:
@@ -95,66 +95,63 @@
 					</div>
 				)
 			}
-		});
+		}
 
-		var SalaryInput = React.createClass({
-			onValueChange : function(evt){
+		class SalaryInput extends React.Component {
+			onValueChange(evt){
 				var value = evt.target.value.toInt();
 				this.props.valueChange(value);
-			},
-			render : function(){
+			}
+			render(){
 				return (
 					<div className="field">
 						<label htmlFor="">{this.props.label}</label>
-						<input type="text" onChange={this.onValueChange} />
+						<input type="text" onChange={this.onValueChange.bind(this)} />
 					</div>
 				)
 			}
-		});
+		}
 
-		var SalaryRangeInput = React.createClass({
-			getInitialState : function(){
-				return {
-					currentValue : 0
-				}
-			},
-			onValueChange : function(evt){
+		class SalaryRangeInput extends React.Component{
+			constructor(){
+				super()
+				this.state = {currentValue : 0};
+			}
+			onValueChange(evt){
 				var value = evt.target.value.toInt();
 				this.setState({currentValue : value});
 				this.props.valueChange(value);
-			},
-			render : function(){
+			}
+			render(){
 				return (
 					<div className="field">
 						<label htmlFor="">{this.props.label}</label>
-						<input type="range" min="0" max="30" value={this.state.currentValue} onChange={this.onValueChange}/>
+						<input type="range" min="0" max="30" value={this.state.currentValue} onChange={this.onValueChange.bind(this)}/>
 						<span id="spanTax">{this.state.currentValue}</span>
 					</div>
 				)
 			}
-		})
+		}
 
-		var SalaryCalculator = React.createClass({
+		class SalaryCalculator extends React.Component{
 			
-			getOnInputChangeFor : function(model){
+			getOnInputChangeFor (model){
 				return function(value){
 					this.props.calculator.set(model, value);
 				}.bind(this);
-			},
+			}
 			
-			onCalculateClick : function(){
+			onCalculateClick(){
 				this.props.calculator.calculate();
-			},
+			}
 			
-			render : function(){
+			render(){
 				var data = this.props.calculator.toJson();
 				
 				var products = ['Pen', 'Pencil', 'Marker'];
-				/* var productItems = products.map(function(product){
-					return <li>{product}</li>
-				}); */
+				
 
-				var productItems = products.map(product => (<li>{product}</li>));
+				var productItems = products.map((product,idx) => (<li key={idx}>{product}</li>));
 
 				return (
 					<div className="content" id="view1">
@@ -164,7 +161,7 @@
 						<SalaryRangeInput label="Tax :" valueChange={this.getOnInputChangeFor('tax')}></SalaryRangeInput>
 
 						<div className="field">
-							<input type="button" value="Calculate" id="btnCalculate" onClick={this.onCalculateClick}/>
+							<input type="button" value="Calculate" id="btnCalculate" onClick={this.onCalculateClick.bind(this)}/>
 						</div>
 						<SalaryDisplay data={data.salary}></SalaryDisplay>
 						<hr/>
@@ -176,7 +173,7 @@
 					</div>
 				);
 			}
-		});
+		}
 	
 		var model = new SalaryCalculatorModel();
 
