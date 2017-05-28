@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+		section{
+			margin-bottom: 10px;
+		}
+		.closed{
+			color : red;
+			font-style: italic;
+			font-weight: bold;
+			text-decoration: line-through;
+		}
+		.stats, .bugname{
+			font-size: 22pt;
+		}
+		ol{
+			list-style: none;
+			width: 500px;
+			-webkit-padding-start : 0px;
+		}
+		li{
+			margin-bottom: 10px;
+			border: 1px solid gray;
+			background-color: #e7e7e7;
+			padding: 5px;
+			border-radius: 5px;
+		}
+		.bugname{
+			cursor : pointer;
+		}
+		.datetime{
+			font-style : italic;
+		}
+	</style>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="MyRedux.js"></script>
+	<script type="text/babel">
+
+		//Behavior
+		function bugsReducer(currentState = [], action){
+			switch(action.type){
+				case 'ADD_NEW':
+					var newBug = { name : action.payload, isClosed : false};
+					return [...currentState, newBug];
+				case 'TOGGLE':
+					var bugToToggle = action.payload;
+					var toggledBug = {
+						name : bugToToggle.name,
+						isClosed : !bugToToggle.isClosed
+					};
+					return currentState.map(bug => bug === bugToToggle ? toggledBug : bug);
+				case 'REMOVE_CLOSED':
+					return currentState.filter(bug => !bug.isClosed);
+				default:
+					return currentState;
+			}
+		}
+
+		//State
+		var store = Redux.createStore(bugsReducer);
+
+		class BugItem extends React.Component{
+			onBugNameClick(){
+				var toggleAction = {
+					type : 'TOGGLE',
+					payload : this.props.bug
+				};
+				this.props.store.dispatch(toggleAction);
+			}
+			render(){
+				var bug = this.props.bug;
+				var bugNameItem = bug.isClosed ?
+					(<span className="bugname closed" onClick={this.onBugNameClick.bind(this)}>{bug.name}</span>) :
+					(<span className="bugname" onClick={this.onBugNameClick.bind(this)}>{bug.name}</span>);
+				return(
+					<li>
+						{bugNameItem}
+						<div>{bug.isClosed.toString()}</div>
+						<div className="datetime">[Created At]</div>
+					</li>
+				)
+			}
+		}
+		class BugStats extends React.Component{
+			render(){
+				let bugs = this.props.bugs;
+				let closedCount = bugs.reduce((result, bug) =>
+					bug.isClosed ? ++result : result, 0
+				);
+				return (
+					<section className="stats">
+						<span className="closed">{closedCount}</span>
+						<span> / </span>
+						<span>{bugs.length}</span>
+					</section>
+				);
+			}
+		}
+
+		class BugEdit extends React.Component{
+			onAddNewClick(){
+				let bugName = this.refs.txtBugName.value;
+				var addNewAction = {
+					type : 'ADD_NEW',
+					payload : bugName
+				};
+				this.props.store.dispatch(addNewAction);
+			}
+			render(){
+				return (
+					<section className="edit">
+						<label htmlFor="">Bug :</label>
+						<input type="text" ref="txtBugName" />
+						<input type="button" value="Add New" onClick={this.onAddNewClick.bind(this)}/>
+					</section>
+				);
+			}
+		}
+		class BugList extends React.Component{
+			onRemoveClosedClick(){
+				var removeClosedAction = {
+					type : 'REMOVE_CLOSED'
+				};
+				this.props.store.dispatch(removeClosedAction);
+			}
+			render(){
+				let bugs = this.props.store.getState();
+				let bugItems = bugs.map((bug, index) => (
+					<BugItem bug={bug} store={this.props.store} key={index}></BugItem>
+				));
+				return (
+					<section className="list">
+						<ol>
+							{bugItems}
+						</ol>
+						<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClick.bind(this)}/>
+					</section>
+				)
+			}
+		}
+		class BugTracker extends React.Component{
+			render(){
+				let bugs = this.props.store.getState();
+				return(
+					<div>
+						<BugStats bugs={bugs}></BugStats>
+						<BugEdit store={this.props.store}></BugEdit>
+						<BugList store={this.props.store}></BugList>
+					</div>
+				)
+			}
+		}
+		
+		store.subscribe(renderApp);
+		function renderApp(){
+			ReactDOM.render(<BugTracker store={store}></BugTracker>, document.getElementById('content'));
+		}
+		renderApp();
+	</script>
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div id="content">
+		
+	</div>
+</body>
+</html>
