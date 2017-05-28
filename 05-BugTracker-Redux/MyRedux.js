@@ -27,13 +27,28 @@ var Redux = (function(){
 			return currentState;
 		}
 
+		
+
 		return {
 			subscribe : subscribe,
 			dispatch : dispatch,
-			getState : getState
+			getState : getState,
 		}
 	}
+
+	function bindActionCreators(actionCreators, dispatch){
+		var result = {};
+		for(var key in actionCreators)
+			result[key] = (function(key){
+					return function(){
+						var action = actionCreators[key].apply(undefined, arguments);
+						dispatch(action);
+					}
+				})(key);
+		return result;
+	}
 	return {
-		createStore : createStore
+		createStore : createStore,
+		bindActionCreators : bindActionCreators
 	}
 })();

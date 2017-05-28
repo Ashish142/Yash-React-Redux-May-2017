@@ -1,0 +1,39 @@
+{
+  "bugs": [
+    {
+      "id": 1,
+      "name": "Data Error",
+      "isClosed": true
+    },
+    {
+      "id": 2,
+      "name": "Server Error",
+      "isClosed": true
+    },
+    {
+      "id": 3,
+      "name": "Routing error",
+      "isClosed": false
+    },
+    {
+      "name": "Another ugly bug",
+      "isClosed": false,
+      "id": 4
+    },
+    {
+      "name": "Reducer error",
+      "isClosed": false,
+      "id": 5
+    }
+  ],
+  "employees": [
+    {
+      "id": 1,
+      "name": "Magesh"
+    },
+    {
+      "id": 2,
+      "name": "Suresh"
+    }
+  ]
+}
