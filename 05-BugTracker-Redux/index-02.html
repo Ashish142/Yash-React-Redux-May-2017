@@ -42,6 +42,7 @@
 	<script src="react-dom.js"></script>
 	<script src="babel.min.js"></script>
 	<script src="redux.js"></script>
+	<script src="react-redux.js"></script>
 	<script type="text/babel">
 
 		//Behavior
@@ -66,8 +67,18 @@
 			}
 		}
 
+		function projectsReducer(currentState = [], action){
+			return [
+				{id : 1, name : 'John Deere Dealers'},
+				{id : 2, name : 'John Deere Customers'}
+			];
+		}
+
+
+
 		//State
-		var store = Redux.createStore(bugsReducer);
+		var combinedReducers = Redux.combineReducers({bugs : bugsReducer, projects : projectsReducer});
+		var store = Redux.createStore(combinedReducers);
 
 		class BugItem extends React.Component{
 			onBugNameClick(){
@@ -159,13 +170,16 @@
 
 		class BugTracker extends React.Component{
 			componentWillMount(){
+				console.log('BugTracker props  ->' , this.props);
 				let {loadAll} = this.props;
 				loadAll();
 			}
 			render(){
-				let { addNew, toggle, removeClosed, bugs } = this.props;
+				let { addNew, toggle, removeClosed, bugs, project } = this.props;
 				return(
 					<div>
+						<h1>{project.name}</h1>
+						<hr/>
 						<BugStats bugs={bugs}></BugStats>
 						<BugEdit addNew={addNew}></BugEdit>
 						<BugList toggle={toggle} removeClosed={removeClosed} bugs={bugs}></BugList>
@@ -278,7 +292,9 @@
 
 		let {addNew, toggle, removeClosed } = actionCreators;
 		*/
-
+		
+		//the below is replaced with 'react-redux'
+		/*
 		let {loadAll, addNew, toggle, removeClosed } = bugActionCreatorFactory(store.dispatch);
 		store.subscribe(renderApp);
 		function renderApp(){
@@ -286,6 +302,27 @@
 			ReactDOM.render(<BugTracker bugs={bugs} loadAll={loadAll} addNew={addNew} toggle={toggle} removeClosed={removeClosed} ></BugTracker>, document.getElementById('content'));
 		}
 		renderApp();
+		*/
+		
+		function mapBugStateToProps(state){
+			return {
+				project : state.projects[0],
+				bugs : state.bugs
+			}
+		}
+
+		function mapBugDispatchToProps(dispatch){
+			return bugActionCreatorFactory(dispatch);
+		}
+
+		var ConnectedBugTracker = ReactRedux.connect(mapBugStateToProps, mapBugDispatchToProps)(BugTracker);
+		
+		ReactDOM.render(
+			<ReactRedux.Provider store={store}>
+				<ConnectedBugTracker></ConnectedBugTracker>
+			</ReactRedux.Provider>
+		, document.getElementById('content'));
+
 	</script>
 </head>
 <body>
