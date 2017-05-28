@@ -69,11 +69,7 @@
 
 		class BugItem extends React.Component{
 			onBugNameClick(){
-				var toggleAction = {
-					type : 'TOGGLE',
-					payload : this.props.bug
-				};
-				this.props.dispatch(toggleAction);
+				this.props.toggle(this.props.bug);
 			}
 			render(){
 				var bug = this.props.bug;
@@ -106,11 +102,7 @@
 		class BugEdit extends React.Component{
 			onAddNewClick(){
 				let bugName = this.refs.txtBugName.value;
-				var addNewAction = {
-					type : 'ADD_NEW',
-					payload : bugName
-				};
-				this.props.dispatch(addNewAction);
+				this.props.addNew(bugName);
 			}
 			render(){
 				return (
@@ -124,15 +116,12 @@
 		}
 		class BugList extends React.Component{
 			onRemoveClosedClick(){
-				var removeClosedAction = {
-					type : 'REMOVE_CLOSED'
-				};
-				this.props.dispatch(removeClosedAction);
+				this.props.removeClosed();
 			}
 			render(){
 				let bugs = this.props.bugs;
 				let bugItems = bugs.map((bug, index) => (
-					<BugItem bug={bug} dispatch={this.props.dispatch} key={index}></BugItem>
+					<BugItem bug={bug} toggle={this.props.toggle} key={index}></BugItem>
 				));
 				return (
 					<section className="list">
@@ -146,20 +135,54 @@
 		}
 		class BugTracker extends React.Component{
 			render(){
-				let bugs = this.props.store.getState();
+				let { addNew, toggle, removeClosed, bugs } = this.props;
 				return(
 					<div>
 						<BugStats bugs={bugs}></BugStats>
-						<BugEdit dispatch={this.props.store.dispatch}></BugEdit>
-						<BugList dispatch={this.props.store.dispatch} bugs={bugs}></BugList>
+						<BugEdit addNew={addNew}></BugEdit>
+						<BugList toggle={toggle} removeClosed={removeClosed} bugs={bugs}></BugList>
 					</div>
 				)
 			}
 		}
+
+		function bugActionCreatorFactory(dispatch){
+
+			function addNew(bugName){
+				var addNewAction = {
+					type : 'ADD_NEW',
+					payload : bugName
+				};
+				dispatch(addNewAction);
+			}
+
+			function toggle(bug){
+				var toggleAction = {
+					type : 'TOGGLE',
+					payload : bug
+				};
+				dispatch(toggleAction);
+			}
+
+			function removeClosed(){
+				var removeClosedAction = {
+					type : 'REMOVE_CLOSED'
+				};
+				dispatch(removeClosedAction);
+			}
+			return {
+				addNew : addNew,
+				toggle : toggle,
+				removeClosed : removeClosed
+			};
+		}
 		
+		let {addNew, toggle, removeClosed } = bugActionCreatorFactory(store.dispatch);
+
 		store.subscribe(renderApp);
 		function renderApp(){
-			ReactDOM.render(<BugTracker store={store}></BugTracker>, document.getElementById('content'));
+			let bugs = store.getState();
+			ReactDOM.render(<BugTracker bugs={bugs} addNew={addNew} toggle={toggle} removeClosed={removeClosed} ></BugTracker>, document.getElementById('content'));
 		}
 		renderApp();
 	</script>
