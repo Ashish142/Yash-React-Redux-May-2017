@@ -53,15 +53,14 @@
 				case 'ADD_NEW':
 					var newBug = action.payload;
 					return [...currentState, newBug];
+
 				case 'TOGGLE':
-					var bugToToggle = action.payload;
-					var toggledBug = {
-						name : bugToToggle.name,
-						isClosed : !bugToToggle.isClosed
-					};
-					return currentState.map(bug => bug === bugToToggle ? toggledBug : bug);
+					var toggledBug = action.payload;
+					return currentState.map(bug => bug.id === toggledBug.id ? toggledBug : bug);
+
 				case 'REMOVE_CLOSED':
 					return currentState.filter(bug => !bug.isClosed);
+
 				default:
 					return currentState;
 			}
@@ -187,11 +186,23 @@
 			}
 
 			function toggle(bug){
-				var toggleAction = {
-					type : 'TOGGLE',
-					payload : bug
-				};
-				dispatch(toggleAction);
+				bug.isClosed = !bug.isClosed;
+				fetch('http://localhost:3000/bugs/' + bug.id, {
+					method : 'PUT',
+					headers : {
+						'content-type' : 'application/json'
+				    },
+					body : JSON.stringify(bug)
+				})
+				.then(response => response.json())
+				.then(toggledBug => {
+					var toggleAction = {
+						type : 'TOGGLE',
+						payload : toggledBug
+					};
+					dispatch(toggleAction);
+				});
+				
 			}
 
 			function removeClosed(){

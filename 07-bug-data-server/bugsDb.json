@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "Data Error",
-      "isClosed": true
+      "isClosed": false
     },
     {
       "id": 2,
@@ -13,7 +13,7 @@
     {
       "id": 3,
       "name": "Routing error",
-      "isClosed": false
+      "isClosed": true
     },
     {
       "name": "Another ugly bug",
