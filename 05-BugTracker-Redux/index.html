@@ -73,7 +73,7 @@
 					type : 'TOGGLE',
 					payload : this.props.bug
 				};
-				this.props.store.dispatch(toggleAction);
+				this.props.dispatch(toggleAction);
 			}
 			render(){
 				var bug = this.props.bug;
@@ -89,21 +89,19 @@
 				)
 			}
 		}
-		class BugStats extends React.Component{
-			render(){
-				let bugs = this.props.bugs;
-				let closedCount = bugs.reduce((result, bug) =>
-					bug.isClosed ? ++result : result, 0
-				);
-				return (
-					<section className="stats">
-						<span className="closed">{closedCount}</span>
-						<span> / </span>
-						<span>{bugs.length}</span>
-					</section>
-				);
-			}
-		}
+		let BugStats = ({bugs}) => {
+			let closedCount = bugs.reduce((result, bug) =>
+				bug.isClosed ? ++result : result, 0
+			);
+			return (
+				<section className="stats">
+					<span className="closed">{closedCount}</span>
+					<span> / </span>
+					<span>{bugs.length}</span>
+				</section>
+			);
+		};
+		
 
 		class BugEdit extends React.Component{
 			onAddNewClick(){
@@ -112,7 +110,7 @@
 					type : 'ADD_NEW',
 					payload : bugName
 				};
-				this.props.store.dispatch(addNewAction);
+				this.props.dispatch(addNewAction);
 			}
 			render(){
 				return (
@@ -129,12 +127,12 @@
 				var removeClosedAction = {
 					type : 'REMOVE_CLOSED'
 				};
-				this.props.store.dispatch(removeClosedAction);
+				this.props.dispatch(removeClosedAction);
 			}
 			render(){
-				let bugs = this.props.store.getState();
+				let bugs = this.props.bugs;
 				let bugItems = bugs.map((bug, index) => (
-					<BugItem bug={bug} store={this.props.store} key={index}></BugItem>
+					<BugItem bug={bug} dispatch={this.props.dispatch} key={index}></BugItem>
 				));
 				return (
 					<section className="list">
@@ -152,8 +150,8 @@
 				return(
 					<div>
 						<BugStats bugs={bugs}></BugStats>
-						<BugEdit store={this.props.store}></BugEdit>
-						<BugList store={this.props.store}></BugList>
+						<BugEdit dispatch={this.props.store.dispatch}></BugEdit>
+						<BugList dispatch={this.props.store.dispatch} bugs={bugs}></BugList>
 					</div>
 				)
 			}
